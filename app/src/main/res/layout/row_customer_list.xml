@@ -41,30 +41,4 @@
             android:textStyle="italic" />
     </LinearLayout>
 
-    <!--<LinearLayout-->
-        <!--style="@style/layoutVertical"-->
-        <!--android:layout_weight="1.6"-->
-        <!--android:gravity="center_vertical"-->
-        <!--android:padding="5dp" >-->
-
-        <!--<EditText-->
-            <!--android:id="@+id/txtQuantity"-->
-            <!--style="@style/lbl14sp"-->
-            <!--android:layout_marginBottom="10dp"-->
-            <!--android:gravity="center"-->
-            <!--android:imeOptions="actionDone"-->
-            <!--android:inputType="numberSigned"-->
-            <!--android:maxLength="2"-->
-            <!--android:singleLine="true"-->
-            <!--android:textStyle="bold" />-->
-
-        <!--<com.projectemplate.shopping.view.widget.AutoBgButton-->
-            <!--android:id="@+id/btnDelete"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="@drawable/btn_nomal"-->
-            <!--android:text="@string/strDelete"-->
-            <!--android:textColor="@color/white" />-->
-    <!--</LinearLayout>-->
-
 </LinearLayout>

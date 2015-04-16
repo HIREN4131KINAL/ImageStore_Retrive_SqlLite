@@ -246,8 +246,7 @@ public class CustomerDetailsFragment extends Fragment {
             // Determine Uri of camera image to save.
             final File rootDir = new File(Constants.PICTURE_DIRECTORY);
 
-            // Create the destination path if it does not exist.
-            //noinspection ResultOfMethodCallIgnored
+             //noinspection ResultOfMethodCallIgnored
             rootDir.mkdirs();
 
             // Create the temporary file and get it's URI.
