@@ -22,7 +22,8 @@
     <string name="hint_customer_phone">Customer Phone</string>
     <string name="hint_customer_street_address">Street Address</string>
     <string name="hint_customer_city">City</string>
-    <string name="hint_customer_state">Zip Code</string>
+    <string name="hint_customer_state">State</string>
     <string name="hint_customer_zip_code">Zip Code</string>
     <string name="hint_customer_note">Note</string>
+    <string name="no_customer">You have not added any customer yet</string>
 </resources>

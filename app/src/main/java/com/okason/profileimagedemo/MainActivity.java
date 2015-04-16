@@ -135,9 +135,9 @@ public class MainActivity extends ActionBarActivity
 
         switch (frag){
             case CustomerDetailsFragment:
-                CustomerDetailsFragment serviceFrag = CustomerDetailsFragment.newInstance(sectionNumber, itemId);
+                CustomerDetailsFragment customerFrag = CustomerDetailsFragment.newInstance(sectionNumber, itemId);
                 navFrag.mDrawerToggle.setDrawerIndicatorEnabled(false);
-                fragmentManager.beginTransaction().replace(R.id.container, serviceFrag)
+                fragmentManager.beginTransaction().replace(R.id.container, customerFrag)
                         .addToBackStack(null).commit();
                 break;
             case ProductDetailsFragment:

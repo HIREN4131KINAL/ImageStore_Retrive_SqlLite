@@ -124,7 +124,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             if (database != null) {
                 //Prepare the customer information that will be saved to the database
                 ContentValues values = new ContentValues();
-                values.put(Constants.COLUMN_CUSTOMER_ID, customer.getId());
                 values.put(Constants.COLUMN_NAME, customer.getName());
                 values.put(Constants.COLUMN_EMAIL, customer.getEmailAddress());
                 values.put(Constants.COLUMN_PHONE, customer.getPhoneNumber());

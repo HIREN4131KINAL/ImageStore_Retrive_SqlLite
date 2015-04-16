@@ -17,6 +17,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -106,12 +108,12 @@ public class CustomerDetailsFragment extends Fragment {
         // Ensure there is a saved instance state.
         if (savedInstanceState != null) {
 
-            // Get the saved logo uri string.
-            String logoUriString = savedInstanceState.getString(Constants.KEY_IMAGE_URI);
+            // Get the saved Image uri string.
+            String ImageUriString = savedInstanceState.getString(Constants.KEY_IMAGE_URI);
 
-            // Restore the logo uri from the logo uri string.
-            if (logoUriString != null) {
-                mCapturedImageURI = Uri.parse(logoUriString);
+            // Restore the Image uri from the Image uri string.
+            if (ImageUriString != null) {
+                mCapturedImageURI = Uri.parse(ImageUriString);
             }
             mCurrentImagePath = savedInstanceState.getString(Constants.KEY_IMAGE_URI);
         }
@@ -156,7 +158,7 @@ public class CustomerDetailsFragment extends Fragment {
         mZipCodeEditText.setText(mCustomer.getPostalCode());
 
 
-        // Update profile's logo
+        // Update profile's Image
         if (mCurrentImagePath != null && !mCurrentImagePath.isEmpty()) {
             mProfileImageButton.setImageDrawable(new BitmapDrawable(getResources(),
                     FileUtils.getResizedBitmap(mCurrentImagePath, 512, 512)));
@@ -194,10 +196,20 @@ public class CustomerDetailsFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.customer_details_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
                 getActivity().onBackPressed();
+                break;
+            case R.id.action_save_customer:
+                SaveCustomer();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -211,88 +223,100 @@ public class CustomerDetailsFragment extends Fragment {
         mCustomer.setCity(mCityEditText.getText().toString());
         mCustomer.setState(mStateEditText.getText().toString());
         mCustomer.setPostalCode(mZipCodeEditText.getText().toString());
-        //mCustomer.setImagePath(mImagePath.getTe);
 
+        //Check to see if there is valid image path temporarily in memory
+        //Then save that image path to the database and that becomes the profile
+        //Image for this user.
+        if (mCurrentImagePath != null && !mCurrentImagePath.isEmpty())
+        {
+            mCustomer.setImagePath(mCurrentImagePath);
+        }
 
         long result = db.addCustomer(mCustomer);
-        if (result != 1){
+        if (result == -1 ){
             Toast.makeText(getActivity(), "Unable to add customer: " + mCustomer.getName(), Toast.LENGTH_LONG).show();
         }
+        getActivity().onBackPressed();
     }
 
     private void chooseImage(){
 
-        // Determine Uri of camera image to save.
-        final File rootDir = new File(Constants.PICTURE_DIRECTORY);
+        //We need the customer's name to to save the image file
+        if (mNameEditText.getText() != null && !mNameEditText.getText().toString().isEmpty()) {
+            // Determine Uri of camera image to save.
+            final File rootDir = new File(Constants.PICTURE_DIRECTORY);
 
-        // Create the destination path if it does not exist.
-        //noinspection ResultOfMethodCallIgnored
-        rootDir.mkdirs();
+            // Create the destination path if it does not exist.
+            //noinspection ResultOfMethodCallIgnored
+            rootDir.mkdirs();
 
-        // Create the temporary file and get it's URI.
+            // Create the temporary file and get it's URI.
 
-        //Get the customer name
-        String customerName = mNameEditText.getText().toString();
+            //Get the customer name
+            String customerName = mNameEditText.getText().toString();
 
-        //Remove all white space in the customer name
-        customerName.replaceAll("\\s+","");
+            //Remove all white space in the customer name
+            customerName.replaceAll("\\s+", "");
 
-        //Use the customer name to create the file name of the image that will be captured
-        File file = new File(rootDir, FileUtils.generateImageName(customerName));
-        mCapturedImageURI = Uri.fromFile(file);
+            //Use the customer name to create the file name of the image that will be captured
+            File file = new File(rootDir, FileUtils.generateImageName(customerName));
+            mCapturedImageURI = Uri.fromFile(file);
 
-        // Initialize a list to hold any camera application intents.
-        final List<Intent> cameraIntents = new ArrayList<Intent>();
+            // Initialize a list to hold any camera application intents.
+            final List<Intent> cameraIntents = new ArrayList<Intent>();
 
-        // Get the default camera capture intent.
-        final Intent captureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            // Get the default camera capture intent.
+            final Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        // Get the package manager.
-        final PackageManager packageManager = getActivity().getPackageManager();
+            // Get the package manager.
+            final PackageManager packageManager = getActivity().getPackageManager();
 
-        // Ensure the package manager exists.
-        if (packageManager != null) {
+            // Ensure the package manager exists.
+            if (packageManager != null) {
 
-            // Get all available image capture app activities.
-            final List<ResolveInfo> listCam = packageManager.queryIntentActivities(captureIntent, 0);
+                // Get all available image capture app activities.
+                final List<ResolveInfo> listCam = packageManager.queryIntentActivities(captureIntent, 0);
 
-            // Create camera intents for all image capture app activities.
-            for(ResolveInfo res : listCam) {
+                // Create camera intents for all image capture app activities.
+                for(ResolveInfo res : listCam) {
 
-                // Ensure the activity info exists.
-                if (res.activityInfo != null) {
+                    // Ensure the activity info exists.
+                    if (res.activityInfo != null) {
 
-                    // Get the activity's package name.
-                    final String packageName = res.activityInfo.packageName;
+                        // Get the activity's package name.
+                        final String packageName = res.activityInfo.packageName;
 
-                    // Create a new camera intent based on android's default capture intent.
-                    final Intent intent = new Intent(captureIntent);
+                        // Create a new camera intent based on android's default capture intent.
+                        final Intent intent = new Intent(captureIntent);
 
-                    // Set the intent data for the current image capture app.
-                    intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
-                    intent.setPackage(packageName);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, mCapturedImageURI);
+                        // Set the intent data for the current image capture app.
+                        intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+                        intent.setPackage(packageName);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, mCapturedImageURI);
 
-                    // Add the intent to available camera intents.
-                    cameraIntents.add(intent);
+                        // Add the intent to available camera intents.
+                        cameraIntents.add(intent);
+                    }
                 }
             }
+
+            // Create an intent to get pictures from the filesystem.
+            final Intent galleryIntent = new Intent();
+            galleryIntent.setType("image/*");
+            galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+
+            // Chooser of filesystem options.
+            final Intent chooserIntent = Intent.createChooser(galleryIntent, "Select Source");
+
+            // Add the camera options.
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,
+                    cameraIntents.toArray(new Parcelable[cameraIntents.size()]));
+
+            // Start activity to choose or take a picture.
+            startActivityForResult(chooserIntent, Constants.ACTION_REQUEST_IMAGE);
+        } else {
+            mNameEditText.setError("Please enter customer name");
         }
-
-        // Create an intent to get pictures from the filesystem.
-        final Intent galleryIntent = new Intent();
-        galleryIntent.setType("image/*");
-        galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-
-        // Chooser of filesystem options.
-        final Intent chooserIntent = Intent.createChooser(galleryIntent, "Select Source");
-
-        // Add the camera options.
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,
-                cameraIntents.toArray(new Parcelable[cameraIntents.size()]));
-
-        // Start activity to choose or take a picture.
-        startActivityForResult(chooserIntent, Constants.ACTION_REQUEST_IMAGE);
     }
 
     @Override
